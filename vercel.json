@@ -1,0 +1,9 @@
+{
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "sh vercel-build.sh",
+  "outputDirectory": "artifacts/course-app/dist/public",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
