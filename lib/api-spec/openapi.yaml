@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: courseMedia
+    description: Protected course media delivery
+  - name: adminLearners
+    description: Administrator-only learner account management
 paths:
   /healthz:
     get:
@@ -24,7 +28,174 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /course-media/signed-url:
+    post:
+      operationId: createCourseMediaSignedUrl
+      tags: [courseMedia]
+      summary: Create a short-lived URL for authorized course media
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseMediaSignedUrlInput"
+      responses:
+        "200":
+          description: Short-lived media URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseMediaSignedUrl"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Session is not permitted to view the requested media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Invalid bearer session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Media signing failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: Media signing is not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /admin/learners:
+    post:
+      operationId: createAdminLearner
+      tags: [adminLearners]
+      summary: Create a learner account as an administrator
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLearnerCreateInput"
+      responses:
+        "201":
+          description: Learner account created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminLearnerResponse"
+        "400":
+          description: Invalid learner details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Administrator role required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: Email already belongs to a learner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Account creation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: Supabase administration is not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /admin/learners/{learnerId}:
+    delete:
+      operationId: deleteAdminLearner
+      tags: [adminLearners]
+      summary: Delete a learner and terminate their access
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: learnerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Learner account deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminLearnerDeleteResponse"
+        "400":
+          description: Invalid learner identifier
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Administrator role required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Learner not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Learner deletion failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: Supabase administration is not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +204,86 @@ components:
           type: string
       required:
         - status
+    CourseMediaSignedUrlInput:
+      type: object
+      properties:
+        contentId:
+          type: string
+          format: uuid
+        mediaType:
+          type: string
+          enum: [content, thumbnail]
+      required:
+        - contentId
+    AdminLearnerCreateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          minLength: 12
+          maxLength: 128
+      required:
+        - name
+        - email
+        - password
+    AdminLearner:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - email
+        - createdAt
+    AdminLearnerResponse:
+      type: object
+      properties:
+        learner:
+          $ref: "#/components/schemas/AdminLearner"
+      required:
+        - learner
+    AdminLearnerDeleteResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+      required:
+        - ok
+    CourseMediaSignedUrl:
+      type: object
+      properties:
+        signedUrl:
+          type: string
+          format: uri
+        expiresIn:
+          type: integer
+          minimum: 1
+      required:
+        - signedUrl
+        - expiresIn
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
 

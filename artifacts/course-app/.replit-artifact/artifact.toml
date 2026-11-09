@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Course App"
+description = "A learner and administrator platform for managing online courses, course materials, and learner access. Connects to Supabase using environment variables configured by the owner."
+version = "1.0.0"
+id = "artifacts/course-app"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20216
+
+[services.development]
+run = "pnpm --filter @workspace/course-app run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/course-app", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/course-app/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20216"
+BASE_PATH = "/"

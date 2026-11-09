@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.englishwithali.app",
+        "sha256_cert_fingerprints": ["65:E7:A1:6D:EC:4C:C2:0F:96:9A:75:4A:26:AE:B2:81:80:64:AD:BE:C8:6C:70:D5:A8:4A:26:45:CF:F6:46:69"]
+      }
+    }]
