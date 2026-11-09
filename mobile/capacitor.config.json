@@ -1,0 +1,9 @@
+{
+  "appId": "com.englishwithali.secure",
+  "appName": "English with Ali",
+  "webDir": "www",
+  "server": {
+    "url": "https://course-app12.vercel.app",
+    "cleartext": false
+  }
+}
