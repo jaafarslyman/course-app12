@@ -121,7 +121,7 @@ export function LearnerAccessPage() {
   });
 
   useEffect(() => {
-    if (status === 'signed-in' && learner) setLocation('/learn');
+    if (status === 'signed-in' && learner) setLocation('/learn/course');
   }, [learner, setLocation, status]);
 
   async function signIn(values: LoginValues) {
@@ -143,7 +143,7 @@ export function LearnerAccessPage() {
         setFormError('هذا الحساب غير مخصّص كحساب متعلّم.');
         return;
       }
-      setLocation('/learn');
+      setLocation('/learn/course');
     } catch {
       setFormError('تعذّر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور.');
     } finally {

@@ -70,7 +70,7 @@ export default function App() {
           </Route>
           <Route path="/learn">
             <RequireLearner>
-              <LearnerCourseCatalogPage />
+              <LearnerCoursesRedirect />
             </RequireLearner>
           </Route>
           <Route path="/learn/course/:courseId/level/:levelId/section/:sectionId/content/:contentId">
@@ -110,7 +110,7 @@ export default function App() {
           </Route>
           <Route path="/learn/content">
             <RequireLearner>
-              <LearnerCourseCatalogPage />
+              <LearnerCoursesRedirect />
             </RequireLearner>
           </Route>
           <Route>
@@ -123,6 +123,16 @@ export default function App() {
       </TooltipProvider>
     </QueryClientProvider>
   );
+}
+
+function LearnerCoursesRedirect() {
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    setLocation('/learn/course');
+  }, [setLocation]);
+
+  return <LoadingState label="جارٍ فتح الدورات…" />;
 }
 
 function RequireAdmin({ children }: { children: ReactNode }) {

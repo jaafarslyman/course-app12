@@ -16,7 +16,6 @@ const adminNavigation = [
 ];
 
 const learnerNavigation = [
-  { href: '/learn', label: 'الرئيسية', icon: LayoutDashboard },
   { href: '/learn/course', label: 'الدورات', icon: BookOpen },
 ];
 
@@ -93,8 +92,7 @@ export function AppShell({
     audience === 'learner' ? learnerNavigation : adminNavigation;
   const isActive = (href: string) =>
     location === href ||
-    (href !== '/admin' && href !== '/learn' && location.startsWith(`${href}/`)) ||
-    (href === '/learn/course' && (location.startsWith('/learn/course/') || location === '/learn/content'));
+    (href !== '/admin' && href !== '/learn' && location.startsWith(`${href}/`));
   const handleSignOut =
     onSignOut ??
     (async () => {
